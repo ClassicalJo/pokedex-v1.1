@@ -1,6 +1,5 @@
 import React from 'react'
 
-
 class Ability extends React.Component {
     render() {
         return (
@@ -14,6 +13,5 @@ class Ability extends React.Component {
             </div>)
     }
 }
-
 
 export default Ability

@@ -17,7 +17,9 @@
   grid-area: main;
   justify-self: center;
 }
-
+.app {
+  grid-area: main; 
+}
 .main {
   grid-area: main;
   display:grid;
@@ -30,7 +32,7 @@
   "sprites height"
   "sprites weight"
   "sprites types"
-  "number types"
+  "number moves"
   "stats abilities"
   "description description";
 }
@@ -44,7 +46,8 @@
 }
 
 a:link {
-  text-decoration: 1px black
+  text-decoration: 1px black;
+  color: black;
 }
 
 a:visited{
@@ -73,7 +76,7 @@ h1 {
 }
 
 
-.list {
+.pokemon-list {
   grid-area: list;
   display: grid;
   max-height: 1em;
@@ -90,6 +93,14 @@ h1 {
   width: 2em;
   text-align: center;
   font-family: 'Courier New', Courier, monospace;
+}
+.searcher > input::placeholder {
+  color: black;
+  opacity: 1;
+}
+
+.searcher >input:focus::placeholder{
+  color: transparent;
 }
 
 .navButton {
@@ -108,6 +119,10 @@ h1 {
   font-size: medium;
   margin-bottom: 0.5px;
   text-align: center;
+}
+
+.pokemonButton:focus {
+  outline: 1px solid black;
 }
 
 .number {
@@ -132,6 +147,10 @@ h1 {
 }
 .types {
   grid-area: types;
+}
+.moves {
+  grid-area: moves;
+  text-decoration: underline solid black;
 }
 
 .sprites {
@@ -181,26 +200,30 @@ img {
   text-justify: auto;
 }
 
-.ability-screen {
-  border: 5px;
-  border-style: inset;
-  grid-area: main;
+.screen {
+  margin-left: 2em;
+  margin-right: 1em;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  padding: 1em;
+  border: 3px;
+  border-style: outset;
+  background-color:white;
+  grid-row-start: 1;
+  grid-row-end: 8;
+  grid-column-start: 1;
+  grid-column-end: 3;
+  z-index: 10;
+  align-content: space-between;
+  overflow-y: scroll;
+  display: grid;
+  height: 80%;
+  width: 80%;
 }
 
-.ability-screen-text {
+.screen-text {
   margin-bottom: 1em
 }
-
-.type-screen {
-  border: 5px;
-  border-style: inset;
-  grid-area: main;
-}
-
-.type-screen-text {
-  margin-bottom: 1em;
-}
-
 
 .screen-close {
   border: 0px;
@@ -210,6 +233,7 @@ img {
   font-family: 'Courier New', Courier, monospace;
   text-decoration: underline solid black;
 }
+
 .hidden {
   display: none;
 }

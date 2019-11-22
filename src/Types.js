@@ -1,6 +1,5 @@
 import React from 'react'
 
-
 class Types extends React.Component {
     render() {
         return (
@@ -14,6 +13,5 @@ class Types extends React.Component {
             </div>)
     }
 }
-
 
 export default Types

@@ -5,21 +5,27 @@ import Ability from "./Ability"
 import Types from "./Types"
 import AbilityScreen from './AbilityScreen';
 import TypeScreen from './TypeScreen';
+import MovesScreen from "./MovesScreen"
 
 
 class App extends React.Component {
       constructor(props) {
             super(props);
             this.state = {
-                  pokemonUrl: "https://pokeapi.co/api/v2/pokemon/1/",
                   pokemonSpecies: "https://pokeapi.co/api/v2/pokemon-species/1/",
-                  currentIndex: 0,
+                  currentImageIndex: 0,
+                  showTypeScreen: false,
+                  showAbilityScreen: false,
+                  showMovesScreen: false,
             }
             this.componentDidUpdate = this.componentDidUpdate.bind(this)
             this.handleClickAbility = this.handleClickAbility.bind(this)
+            this.handleClickType = this.handleClickType.bind(this)
+            this.handleClickMoves = this.handleClickMoves.bind(this)
       }
+
       componentDidMount() {
-            fetch(this.state.pokemonUrl)
+            fetch(this.props.pokemonUrl)
                   .then((responseText) => responseText.json())
                   .then((response) => this.setState(response))
                   .then(fetch(this.state.pokemonSpecies)
@@ -29,61 +35,58 @@ class App extends React.Component {
 
       componentDidUpdate(prevProps) {
             if (prevProps.pokemonUrl !== this.props.pokemonUrl) {
-                  fetch(this.props.pokemonUrl)
+                  this.removeScreen()
+                  fetch(`https://pokeapi.co/api/v2/pokemon/${this.props.pokeName}`)
                         .then((responseText) => responseText.json())
                         .then((response) => this.setState(response))
-                        .then(() => this.setState({
-                              images: [this.state.sprites.front_default, this.state.sprites.back_default, this.state.sprites.front_shiny, this.state.sprites.back_shiny],
-                              currentIndex: 0,
+                        .then(() => this.setState((state) => ({
+                              currentImageIndex: 0,
+                              images:
+                                    [state.sprites.front_default,
+                                    state.sprites.back_default,
+                                    state.sprites.front_shiny,
+                                    state.sprites.back_shiny]
+                        })))
 
-                        }))
-                  fetch(`https://pokeapi.co/api/v2/pokemon-species/${compareUrl(this.props.pokemonUrl)}`)
+                  fetch(`https://pokeapi.co/api/v2/pokemon-species/${this.props.pokeName}`)
                         .then((responseText) => responseText.json())
                         .then((response) => this.setState(response))
             }
       }
 
-
       handleClickNext() {
-            if (this.state.currentIndex < 3) { this.setState({ currentIndex: this.state.currentIndex + 1 }) }
+            if (this.state.currentImageIndex < 3) { this.setState({ currentImageIndex: this.state.currentImageIndex + 1 }) }
       }
 
       handleClickPrevious() {
-            if (this.state.currentIndex > 0) { this.setState({ currentIndex: this.state.currentIndex - 1 }) }
+            if (this.state.currentImageIndex > 0) { this.setState({ currentImageIndex: this.state.currentImageIndex - 1 }) }
       }
 
       handleClickAbility(e) {
-            e.persist()
-            this.setState({ abilityurl: e.target.attributes.abilityurl.nodeValue })
-            let $main = document.querySelector(".main")
-            $main.classList.add("hidden")
-            let $abilityScreen = document.querySelector(".ability-screen")
-            $abilityScreen.classList.remove("hidden")
-
-      }
-
-      handleClickCloseScreenAbility() {
-            let $abilityScreen = document.querySelector(".ability-screen")
-            $abilityScreen.classList.add("hidden")
-            let $main = document.querySelector(".main")
-            $main.classList.remove("hidden")
+            this.setState({
+                  abilityurl: e.target.attributes.abilityurl.nodeValue,
+                  showAbilityScreen: true,
+            })
       }
 
       handleClickType(e) {
-            e.persist()
-            this.setState({ typeurl: e.target.attributes.typeurl.nodeValue })
-            let $main = document.querySelector(".main")
-            $main.classList.add("hidden")
-            let $typeScreen = document.querySelector(".type-screen")
-            $typeScreen.classList.remove("hidden")
-
+            this.setState({
+                  typeurl: e.target.attributes.typeurl.nodeValue,
+                  showTypeScreen: true
+            })
       }
 
-      handleClickCloseScreenType() {
-            let $typeScreen = document.querySelector(".type-screen")
-            $typeScreen.classList.add("hidden")
-            let $main = document.querySelector(".main")
-            $main.classList.remove("hidden")
+      handleClickMoves() {
+            this.setState({
+                  showMovesScreen: true
+            })
+      }
+      removeScreen() {
+            this.setState({
+                  showTypeScreen: false,
+                  showAbilityScreen: false,
+                  showMovesScreen: false,
+            })
       }
 
       render() {
@@ -94,7 +97,7 @@ class App extends React.Component {
                         <div className="app">
                               <div className="main">
                                     <div className="sprites">
-                                          <Sprites currentImg={this.state.images[this.state.currentIndex]} />
+                                          <Sprites currentImg={this.state.images[this.state.currentImageIndex]} />
                                           <input className="spriteButton" type="button" value="<=" onClick={() => this.handleClickPrevious()}></input>
                                           <input className="spriteButton" type="button" value="=>" onClick={() => this.handleClickNext()}></input>
                                     </div>
@@ -102,14 +105,15 @@ class App extends React.Component {
                                     <div className="height">HEIGHT: {stateResults.height / 10} METRE</div>
                                     <div className="weight">WEIGHT: {stateResults.weight / 10} KG.</div>
                                     <div className="number">No. {fixed(stateResults.id)}</div>
-                                    <Types 
-                                          types={this.state.types} 
-                                          onClick={(e) => this.handleClickType(e)}
-                                          />
+                                    <Types
+                                          types={this.state.types}
+                                          onClick={(this.handleClickType)}
+                                    />
                                     <Ability
                                           abilities={this.state.abilities}
-                                          onClick={(e) => this.handleClickAbility(e)}
+                                          onClick={this.handleClickAbility}
                                     />
+                                    <div className="moves" onClick={this.handleClickMoves}>MOVELIST</div>
                                     <div className="stats">
                                           <div>HP: {this.state.stats[5].base_stat}</div>
                                           <div>ATTACK: {this.state.stats[4].base_stat}</div>
@@ -119,19 +123,37 @@ class App extends React.Component {
                                           <div>SPEED: {this.state.stats[0].base_stat}</div>
                                     </div>
                                     <div className="description">{returnFirstResult(this.state.flavor_text_entries)}</div>
+                                    {this.state.showTypeScreen === true &&
+                                          <TypeScreen
+                                                typeurl={this.state.typeurl}
+                                                showTypeScreen={this.state.showTypeScreen}
+                                                onClick={() => this.removeScreen()} />
+                                    }
+                                    {this.state.showAbilityScreen === true &&
+                                          <AbilityScreen
+                                                abilityurl={this.state.abilityurl}
+                                                showAbilityScreen={this.state.showAbilityScreen}
+                                                onClick={() => this.removeScreen()} />
+                                    }
+                                    {this.state.showMovesScreen === true &&
+                                          <MovesScreen
+                                                moves={this.state.moves}
+                                                showMovesScreen={this.state.showMovesScreen}
+                                                onClick={() => this.removeScreen()} />
+                                    }
                               </div>
-                              <AbilityScreen abilityurl={this.state.abilityurl} onClick={() => this.handleClickCloseScreenAbility()} />
-                              <TypeScreen typeurl={this.state.typeurl} onClick={() => this.handleClickCloseScreenType()}/>
+
+
                         </div>
 
                   )
 
             } else {
-                  return <div>loading...</div>
+                  return <div>Loading...</div>
             }
       }
 }
-// 
+
 function fixed(number) {
       let simpleValue = String(number)
       let isFixed = /^[0-9][0-9][0-9]$/.test(simpleValue)
@@ -147,11 +169,6 @@ function fixed(number) {
       }
 
       return fixedValue
-}
-
-function compareUrl(string) {
-      let result = string.replace(/^https:\/\/pokeapi.co\/api\/v2\/pokemon\//, "")
-      return result
 }
 
 function returnFirstResult(array) {
